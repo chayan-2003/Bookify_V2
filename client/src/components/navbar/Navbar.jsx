@@ -41,7 +41,8 @@ const Navbar = () => {
   useEffect(() => {
     const user = localStorage.getItem('user'); // Replace with actual auth check
     if (user) {
-    
+      
+      setIsLoggedIn(true);
     }
   }, [navigate]);
 
