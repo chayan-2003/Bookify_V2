@@ -53,8 +53,9 @@ const ProfilePage = () => {
       }
 
       // Send PUT request with FormData
+      const API_URL="https://bookify-v2-2.onrender.com";
       const response = await axios.put(
-        `http://localhost:8080/api/users/${userId}`,
+        `${API_URL}/api/users/${userId}`,
         formData,
         {
           withCredentials: true,
@@ -75,9 +76,10 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        const API_URL="https://bookify-v2-2.onrender.com";
         const response = await axios({
           method: 'get',
-          url: `http://localhost:8080/api/auth/profile`,
+          url: `${API_URL}/api/auth/profile`,
           withCredentials: true,
         });
         setUserId(response.data._id);

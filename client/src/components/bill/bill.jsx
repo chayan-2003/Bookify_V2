@@ -13,7 +13,7 @@ const BookingDetails = () => {
     const { hotelId, roomId } = useParams();
     const [noofdays, setNoofdays] = useState(0);
     const [loading, setLoading] = useState(false);
-
+    const API_URL="https://bookify-v2-2.onrender.com";
     useEffect(() => {
         const fetchSearchDetails = () => {
             const savedSearchDetails = localStorage.getItem('searchState');
@@ -29,7 +29,8 @@ const BookingDetails = () => {
 
         const fetchUserDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/auth/profile`, { withCredentials: true });
+               
+                const response = await axios.get(`${API_URL}/api/auth/profile`, { withCredentials: true });
                 setUserDetails(response.data);
             } catch (error) {
                 console.error("Error fetching user details:", error);
@@ -38,7 +39,7 @@ const BookingDetails = () => {
 
         const fetchHotelDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/hotels/${hotelId}`, { withCredentials: true });
+                const response = await axios.get(`${API_URL}/api/hotels/${hotelId}`, { withCredentials: true });
                 setHotelDetails(response.data);
             } catch (error) {
                 console.error("Error fetching hotel details:", error);
@@ -47,7 +48,7 @@ const BookingDetails = () => {
 
         const fetchRoomDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/rooms/${roomId}`, { withCredentials: true });
+                const response = await axios.get(`${API_URL}/api/rooms/${roomId}`, { withCredentials: true });
                 setRoomDetails(response.data);
             } catch (error) {
                 console.error("Error fetching room details:", error);

@@ -13,9 +13,9 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
+    const API_URL="https://bookify-v2-2.onrender.com"
     try {
-      const response = await axios.post('http://localhost:8080/api/auth/login', {
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password,
       });

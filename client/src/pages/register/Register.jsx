@@ -19,7 +19,7 @@ const RegistrationPage = () => {
       [name]: value,
     })
   }
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -33,9 +33,9 @@ const RegistrationPage = () => {
     }
 
     setLoading(true)
-
+    const API_URL="https://bookify-v2-2.onrender.com"
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/register', { username, email, password })
+      const res = await axios.post(`${API_URL}/api/auth/register`, { username, email, password })
       navigate('/login') // Redirect to login page on success
     } catch (err) {
       // Handle different error scenarios

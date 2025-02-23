@@ -36,7 +36,8 @@ const Room = () => {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/rooms/${roomId}`);
+                const API_URL="https://bookify-v2-2.onrender.com";
+                const response = await axios.get(`${API_URL}/api/rooms/${roomId}`);
                 setRoom(response.data);
                 setRoomNumbers(response.data.roomNumbers);
        
@@ -70,11 +71,12 @@ const Room = () => {
     };
 
     const handleBookRoom = async () => {
+        const API_URL="https://bookify-v2-2.onrender.com";
         if (!selectedRoom || bookingDates.length === 0) return;
         setShowModal(false);
 
         try {
-            await axios.put(`http://localhost:8080/api/rooms/availability/${selectedRoom._id}`, {
+            await axios.put(`${API_URL}/api/rooms/availability/${selectedRoom._id}`, {
                 dates: bookingDates,
             });
             navigate(`/bookings/${hotelId}/${roomId}/invoice`);
