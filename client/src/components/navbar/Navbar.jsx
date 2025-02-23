@@ -4,10 +4,11 @@ import { FaUserCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { FaSpinner } from 'react-icons/fa';
 import axios from 'axios';
+const API_URL="https://bookify-v2-2.onrender.com";
 const Navbar = () => {
   // State to track if the user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const API_URL="https://bookify-v2-2.onrender.com";
+
   const navigate = useNavigate();
   // Check if the user is logged in when the component mounts
   const [loading, setLoading] = useState(true);
