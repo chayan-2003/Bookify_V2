@@ -11,11 +11,11 @@ const Hotel = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hotelData, setHotelData] = useState([]);
-
+  const API_URL="https://bookify-v2-2.onrender.com";
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/hotels/${hotelId}`);
+        const response = await axios.get(`${API_URL}/api/hotels/${hotelId}`);
         setHotelData(response.data);
         console.log(response.data);
         setLoading(false);
@@ -34,7 +34,7 @@ const Hotel = () => {
     const fetchData = async () => {
       try {
         console.log("INSIDE TRY BLOCK");
-        const response = await axios.get(`http://localhost:8080/api/hotels/rooms/${hotelId}`);
+        const response = await axios.get(`${API_URL}/api/hotels/rooms/${hotelId}`);
         setData(response.data);
         setLoading(false);
       } catch (err) {
