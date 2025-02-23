@@ -1,50 +1,40 @@
-import PDFDocument from "pdfkit";
-import { PassThrough } from "stream";
-import s3 from "../config/awsConfig.js"; 
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import s3 from "../config/awsConfig.js";
 import Bill from "../models/Bills.js";
 
-const generateBillAndUpload = async (bookingDetails) => {
-    const AWS_S3_BUCKET='baidyabatibookings';
+const generateBillAndUpload = async (req, res) => {
+    const { bookingId, guestName, checkIn, checkOut, roomType, totalAmount } = req.body;
+    const AWS_S3_BUCKET = 'baidyabatibookings';
+
     try {
-        const doc = new PDFDocument();
-        const passThrough = new PassThrough();
-        doc.pipe(passThrough);
-
-        doc.fontSize(20).text("Hotel Booking Invoice", { align: "center" });
-        doc.moveDown();
-
-        doc.fontSize(14).text(`Booking ID: ${bookingDetails._id}`);
-        doc.text(`Guest Name: ${bookingDetails.guestName}`);
-        doc.text(`Check-in Date: ${bookingDetails.checkIn}`);
-        doc.text(`Check-out Date: ${bookingDetails.checkOut}`);
-        doc.text(`Room Type: ${bookingDetails.roomType}`);
-        doc.text(`Total Amount: $${bookingDetails.totalAmount}`);
-        doc.moveDown();
-
-        doc.text("Thank you for choosing our hotel!", { align: "center" });
-
-        doc.end();
-
-        const AWS_S3_BUCKET = 'baidyabatibookings';
+        // Generate a pre-signed URL for the S3 upload
         const params = {
             Bucket: AWS_S3_BUCKET,
-            Key: `invoices/invoice_${bookingDetails.bookingId}.pdf`,
-            Body: passThrough,
+            Key: `invoices/invoice_${bookingId}.pdf`,
             ContentType: "application/pdf",
-            ACL: "public-read",
         };
 
-        const uploadResult = await s3.upload(params).promise();
-        const fileUrl = uploadResult.Location;
+        const command = new PutObjectCommand(params);
+        const preSignedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-        const bill = new Bill({ ...bookingDetails, pdfUrl: fileUrl });
+        // Save the bill details in the database
+        const bill = new Bill({
+
+            guestName,
+            checkIn,
+            checkOut,
+            roomType,
+            totalAmount,
+            pdfUrl: `https://${params.Bucket}.s3.${s3.config.region}.amazonaws.com/${params.Key}`
+        });
         await bill.save();
 
-        return fileUrl;
-
+        // Return the pre-signed URL to the frontend
+        res.json({ preSignedUrl });
     } catch (error) {
-        console.error("Error generating bill:", error);
-        throw new Error("Bill generation failed");
+        console.error("Error generating pre-signed URL:", error);
+        res.status(500).json({ message: "Bill generation failed" });
     }
 };
 

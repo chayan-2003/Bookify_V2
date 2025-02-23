@@ -11,7 +11,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   // Check if the user is logged in when the component mounts
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
   const [profileData, setProfileData] = useState(null);
   useEffect(() => {
     const fetchProfile = async () => {
@@ -25,11 +25,11 @@ const Navbar = () => {
             setProfileData(response.data);
         } catch (err) {
             console.error('Error:', err);
-            setError('Failed to fetch profile');
+           
             if (err.response?.status === 401) {
                 navigate('/login');
             }
-            setError('Failed to fetch profile');
+          
         } finally {
             setLoading(false);
         }

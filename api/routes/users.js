@@ -10,7 +10,7 @@ router.get("/checkauthentication", verifyUser, (req, res, next) => {
 });
 
 // UPDATE
-router.put("/:id", verifyUser, upload.single('image'), updatedUser);
+router.put("/:id", verifyUser, upload.single('img'), updatedUser);
 
 // DELETE
 router.delete("/:id", verifyUser, deleteUser);

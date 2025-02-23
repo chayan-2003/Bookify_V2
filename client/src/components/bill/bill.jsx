@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '../navbar/Navbar.jsx';
 import { FaDownload } from 'react-icons/fa';
+import axios from 'axios';
+import jsPDF from 'jspdf';
 
 const BookingDetails = () => {
     const [search, setSearchDetails] = useState(null);
@@ -10,6 +12,8 @@ const BookingDetails = () => {
     const [room, setRoomDetails] = useState(null);
     const { hotelId, roomId } = useParams();
     const [noofdays, setNoofdays] = useState(0);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         const fetchSearchDetails = () => {
             const savedSearchDetails = localStorage.getItem('searchState');
@@ -23,19 +27,19 @@ const BookingDetails = () => {
             }
         };
 
-        const fetchUserDetails = () => {
-            const savedUserDetails = localStorage.getItem('userInfo');
-            if (savedUserDetails) {
-                const parsedUserDetails = JSON.parse(savedUserDetails);
-                setUserDetails(parsedUserDetails);
+        const fetchUserDetails = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/auth/profile`, { withCredentials: true });
+                setUserDetails(response.data);
+            } catch (error) {
+                console.error("Error fetching user details:", error);
             }
         };
 
         const fetchHotelDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/hotels/${hotelId}`);
-                const data = await response.json();
-                setHotelDetails(data);
+                const response = await axios.get(`http://localhost:8080/api/hotels/${hotelId}`, { withCredentials: true });
+                setHotelDetails(response.data);
             } catch (error) {
                 console.error("Error fetching hotel details:", error);
             }
@@ -43,9 +47,8 @@ const BookingDetails = () => {
 
         const fetchRoomDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/rooms/${roomId}`);
-                const data = await response.json();
-                setRoomDetails(data);
+                const response = await axios.get(`http://localhost:8080/api/rooms/${roomId}`, { withCredentials: true });
+                setRoomDetails(response.data);
             } catch (error) {
                 console.error("Error fetching room details:", error);
             }
@@ -55,10 +58,34 @@ const BookingDetails = () => {
         fetchUserDetails();
         fetchHotelDetails();
         fetchRoomDetails();
-    }, [hotelId, roomId, search]);
+    }, [hotelId, roomId]);
+
+    const generatePDF = () => {
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text('Hotel Booking Invoice', 20, 20);
+        doc.setFontSize(12);
+
+        doc.text(`Hotel Name: ${hotel.name}`, 20, 40);
+        doc.text(`Address: ${hotel.address}`, 20, 50);
+        doc.text(`City: ${hotel.city}`, 20, 60);
+        doc.text(`Check-in Date: ${new Date(search.date[0]?.startDate).toLocaleDateString()}`, 20, 70);
+        doc.text(`Check-out Date: ${new Date(search.date[0]?.endDate).toLocaleDateString()}`, 20, 80);
+        doc.text(`Invoice Number: ${search.invoiceNumber}`, 20, 90);
+
+        doc.text(`Name: ${user.username}`, 20, 110);
+        doc.text(`Email: ${user.email}`, 20, 120);
+        doc.text(`Phone: ${user.phone}`, 20, 130);
+        doc.text(`Room Type: ${room.title}`, 20, 150);
+        doc.text(`No of Days: ${noofdays}`, 20, 160);
+        doc.text(`Total Amount: $${room.room_price * noofdays}`, 20, 170);
+
+        return doc;
+    };
 
     const handleDownloadReceipt = () => {
-        alert('Downloading bill receipt...');
+        const doc = generatePDF();
+        doc.save(`invoice_${search.invoiceNumber}.pdf`);
     };
 
     if (!search || !user || !hotel || !room) {
@@ -68,8 +95,6 @@ const BookingDetails = () => {
             </div>
         );
     }
-    
-   
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -80,38 +105,36 @@ const BookingDetails = () => {
                     <div className="space-y-4">
                         <div className="border-b pb-4 mb-4">
                             <h2 className="text-xl font-bold">Hotel Details</h2>
-                            <p><b>Hotel Name:</b> {hotel.name || ""}</p>
-                            <p><b>Address:</b> {hotel.address || ""}</p>
-                            <p><b>City:</b> {hotel.city || ""}</p>
-                            <p><b>Check-in Date:</b> {new Date(search.date[0]?.startDate).toLocaleDateString() || ""}</p>
-                            <p><b>Check-out Date:</b> {new Date(search.date[0]?.endDate).toLocaleDateString() || ""}</p>
-                            <p><b>Invoice Number:</b> {search.invoiceNumber || ""}</p>
+                            <p><b>Hotel Name:</b> {hotel.name}</p>
+                            <p><b>Address:</b> {hotel.address}</p>
+                            <p><b>City:</b> {hotel.city}</p>
+                            <p><b>Check-in Date:</b> {new Date(search.date[0]?.startDate).toLocaleDateString()}</p>
+                            <p><b>Check-out Date:</b> {new Date(search.date[0]?.endDate).toLocaleDateString()}</p>
+                            <p><b>Invoice Number:</b> {search.invoiceNumber}</p>
                         </div>
                         <div className="border-b pb-4 mb-4">
                             <h2 className="text-xl font-bold">Bill To</h2>
-                            <p><b>Name:</b> {user.name || ""}</p>
-                            <p><b>Email:</b> {user.email || ""}</p>
-                            <p><b>Phone:</b> {user.phone || ""}</p>
-                            <p><b>Address:</b> {user.address || ""}</p>
+                            <p><b>Name:</b> {user.username}</p>
+                            <p><b>Email:</b> {user.email}</p>
+                            <p><b>Phone:</b> {user.phone}</p>
                         </div>
                         <div className="border-b pb-4 mb-4">
                             <h2 className="text-xl font-bold">Room Details</h2>
-                            <p><b>Room Type:</b> {room.title || ""}</p>
-                            <p><b>Adults:</b> {search.options?.adult || ""}</p>
-                            <p><b>Children:</b> {search.options?.children || ""}</p>
-                            <p><b>Rooms:</b> {search.options?.room || ""}</p>
-                        </div>
-                        <div className="border-b pb-4 mb-4">
-                            <h2 className="text-xl font-bold">Total Amount</h2>
-                            <p><b>Amount:</b> ${room.room_price || ""}</p>
+                            <p><b>Room Type:</b> {room.title}</p>
+                            <p><b>No of Days:</b> {noofdays}</p>
+                            <p><b>Total Amount:</b> ${room.room_price * noofdays}</p>
                         </div>
                     </div>
                     <div className="mt-6 text-center">
                         <button
                             onClick={handleDownloadReceipt}
-                            className="bg-indigo-600 text-white py-3 px-6 rounded-md font-semibold hover:bg-indigo-700 transition"
+                            disabled={loading}
+                            className={`$${
+                                loading ? 'bg-gray-400' : 'bg-indigo-600 hover:bg-indigo-700'
+                            } text-white py-3 px-6 rounded-md font-semibold transition`}
                         >
-                            <FaDownload className="inline mr-2" /> Download Bill Receipt
+                            <FaDownload className="inline mr-2" />
+                            {loading ? 'Generating...' : 'Generate & Download Bill Receipt'}
                         </button>
                     </div>
                 </div>
