@@ -54,7 +54,7 @@ const ProfilePage = () => {
 
       // Send PUT request with FormData
       const API_URL="https://bookify-v2-2.onrender.com";
-      const response = await axios.put(
+      await axios.put(
         `${API_URL}/api/users/${userId}`,
         formData,
         {
