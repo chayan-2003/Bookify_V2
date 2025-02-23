@@ -52,7 +52,7 @@ const Navbar = () => {
     localStorage.removeItem('user');
     try
     { 
-      axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
+      axios.post(`${API_URL}/api/auth/logout`);
     }
     catch(error)
     {
