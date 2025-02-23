@@ -7,7 +7,7 @@ import axios from 'axios';
 const Navbar = () => {
   // State to track if the user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const API_URL="https://bookify-v2-2.onrender.com";
   const navigate = useNavigate();
   // Check if the user is logged in when the component mounts
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ const Navbar = () => {
         try {
             const response = await axios({
                 method: 'get',
-                url: `http://localhost:8080/api/auth/profile`,
+                url: `${API_URL}/api/auth/profile`,
                 withCredentials: true // Include cookies in the request
             });
             setIsLoggedIn(true);
