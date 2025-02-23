@@ -4,12 +4,18 @@ import axios from 'axios';
 import Navbar from '../../components/navbar/Navbar';
 import { useNavigate } from 'react-router-dom';
 import { FaSpinner } from 'react-icons/fa';
+
 const HotelIntro = () => {
+    const navigate=useNavigate();
+    const user = localStorage.getItem('user');
+    if(!user){
+        navigate('/login');
+    }
     const { id } = useParams();
     const [hotel, setHotel] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const navigate = useNavigate();
+ 
     const API_URL="https://bookify-v2-2.onrender.com";
     useEffect(() => {
         const fetchHotelData = async () => {
