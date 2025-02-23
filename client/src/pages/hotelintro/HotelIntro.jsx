@@ -10,10 +10,11 @@ const HotelIntro = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const API_URL="https://bookify-v2-2.onrender.com";
     useEffect(() => {
         const fetchHotelData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/hotels/${id}`);
+                const response = await axios.get(`${API_URL}/api/hotels/${id}`);
                 setHotel(response.data);
                 console.log(response.data);
             } catch (err) {

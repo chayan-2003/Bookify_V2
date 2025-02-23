@@ -36,7 +36,7 @@ const List = () => {
     setSearch({ city: destination, date, options });
     const getData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/hotels/search?city=${destination}&min=${min || 1}&max=${max || 40000}`);
+        const response = await axios.get(`${API_URL}/api/hotels/search?city=${destination}&min=${min || 1}&max=${max || 40000}`);
         setData(response.data);
         setLoading(false);
       } catch (err) {
