@@ -16,11 +16,12 @@ const List = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const API_URL="https://bookify-v2-2.onrender.com";
   console.log(city);
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/hotels?city=${city}&min=${min || 1}&max=${max || 40000}`);
+        const response = await axios.get(`${API_URL}/api/hotels?city=${city}&min=${min || 1}&max=${max || 40000}`);
         setData(response.data);
         setLoading(false);
       } catch (err) {
