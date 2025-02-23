@@ -18,7 +18,9 @@ const Login = () => {
       const response = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password,
-      });
+      },
+      {withCredentials: true},
+    );
 
       // Save user data in local storage
       localStorage.setItem('user', JSON.stringify(response.data));
