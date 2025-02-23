@@ -32,7 +32,8 @@ export const AuthContextProvider = ({ children }) => {
     const fetchUser = async () => {
       setState((prevState) => ({ ...prevState, loading: true }));
       try {
-        const res = await axios.get("http://localhost:8080/api/auth/profile", {
+        const API_URL="https://bookify-v2-2.onrender.com";
+        const res = await axios.get(`${API_URL}/api/auth/profile`, {
           withCredentials: true,
         });
         setState({ user: res.data, loading: false, error: null });
