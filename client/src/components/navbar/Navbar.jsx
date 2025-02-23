@@ -50,6 +50,14 @@ const Navbar = () => {
   const handleLogout = () => {
     // Remove user from localStorage (or perform any other logout action)
     localStorage.removeItem('user');
+    try
+    { 
+      axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
+    }
+    catch(error)
+    {
+      console.log(error);
+    }
     setIsLoggedIn(false);  // Update the state
     navigate('/');  // Redirect to the login page
      
