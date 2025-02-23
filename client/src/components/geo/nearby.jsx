@@ -37,7 +37,8 @@ const HotelSearch = () => {
         console.log(lat, lng, distance);
 
         try {
-          const response = await axios.get('http://localhost:8080/api/hotels/nearby', {
+          const API_URL="https://bookify-v2-2.onrender.com";
+          const response = await axios.get(`${API_URL}/api/hotels/nearby`, {
             params: {
               lat: parseFloat(lat),
               lng: parseFloat(lng),
