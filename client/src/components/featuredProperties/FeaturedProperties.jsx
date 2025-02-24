@@ -2,7 +2,7 @@ import React from 'react';
 import useFetch from '../../hooks/useFetch';
 
 const FeaturedProperties = () => {
-    const API_URL="https://bookify-v2-2.onrender.com";
+    const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
     const { data, loading } = useFetch(`${API_URL}/api/hotels`);
     const images = [
         "https://media-cdn.tripadvisor.com/media/vr-splice-j/02/fd/34/58.jpg",

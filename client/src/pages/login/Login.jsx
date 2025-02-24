@@ -13,7 +13,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const API_URL="https://bookify-v2-2.onrender.com"
+    const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
     try {
       const response = await axios.post(`${API_URL}/api/auth/login`, {
         email,

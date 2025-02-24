@@ -5,10 +5,10 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SearchContext } from "../../context/SearchContext";
 import useFetch from "../../hooks/useFetch";
-
+const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
 const Reserve = ({ setOpen, hotelId }) => {
   const [selectedRooms, setSelectedRooms] = useState([]);
-  const { data, loading, error } = useFetch(`/api/hotels/room/${hotelId}`);
+  const { data, loading, error } = useFetch(`${API_URL}/api/hotels/room/${hotelId}`);
   const { date } = useContext(SearchContext);
 
   const getDatesInRange = (startDate, endDate) => {
@@ -53,7 +53,7 @@ const Reserve = ({ setOpen, hotelId }) => {
     try {
       await Promise.all(
         selectedRooms.map((roomId) => {
-          const res = axios.put(`http://localhost:8080/api/rooms/availability/${roomId}`, {
+          const res = axios.put(`${API_URL}/api/rooms/availability/${roomId}`, {
             dates: alldates,
           });
           return res.data;

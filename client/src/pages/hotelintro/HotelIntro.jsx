@@ -16,7 +16,7 @@ const HotelIntro = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
  
-    const API_URL="https://bookify-v2-2.onrender.com";
+    const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
     useEffect(() => {
         const fetchHotelData = async () => {
             try {

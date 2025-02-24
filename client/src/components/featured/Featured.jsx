@@ -24,7 +24,7 @@ const Featured = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const API_URL="https://bookify-v2-2.onrender.com";
+                const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
                 const response = await axios.get(`${API_URL}/api/hotels/countByCity`,
                     {
                         params: {

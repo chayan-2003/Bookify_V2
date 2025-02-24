@@ -33,7 +33,7 @@ const RegistrationPage = () => {
     }
 
     setLoading(true)
-    const API_URL="https://bookify-v2-2.onrender.com"
+    const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
     try {
       const res = await axios.post(`${API_URL}/api/auth/register`, { username, email, password })
       navigate('/login') // Redirect to login page on success

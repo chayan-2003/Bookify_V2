@@ -13,7 +13,7 @@ const BookingDetails = () => {
     const { hotelId, roomId } = useParams();
     const [noofdays, setNoofdays] = useState(0);
     const [loading, setLoading] = useState(false);
-    const API_URL="https://bookify-v2-2.onrender.com";
+    const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
     useEffect(() => {
         const fetchSearchDetails = () => {
             const savedSearchDetails = localStorage.getItem('searchState');
