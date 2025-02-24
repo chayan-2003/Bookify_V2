@@ -3,25 +3,20 @@ import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
 
-
-// Handling registration
+// Generate JWT token
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT, {
-        expiresIn: '30d',
-    });
-
-   
+    return jwt.sign({ id }, process.env.JWT, { expiresIn: '30d' });
 };
+
+// Register functionality
 const register = asyncHandler(async (req, res) => {
     const { username, password, email } = req.body;
 
-    // Validation logic
     if (!username || !password || !email) {
         res.status(400);
         throw new Error('Please provide all required fields');
     }
 
-    // Check if user already exists
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -29,16 +24,13 @@ const register = asyncHandler(async (req, res) => {
         throw new Error('User already exists');
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
     const user = await User.create({
         username,
         email,
         password: hashedPassword,
-        
     });
 
     if (user) {
@@ -46,10 +38,6 @@ const register = asyncHandler(async (req, res) => {
             user_id: user._id,
             username: user.username,
             email: user.email,
-            phone: user.phone,
-            image:user.img
-
-            
         });
     } else {
         res.status(400);
@@ -57,18 +45,15 @@ const register = asyncHandler(async (req, res) => {
     }
 });
 
-
-//login functionality 
+// Login functionality with Bearer Token
 const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
-    // Validation logic
     if (!email || !password) {
         res.status(400);
         throw new Error('Please provide all required fields');
     }
 
-    // Check if user exists
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -76,41 +61,32 @@ const login = asyncHandler(async (req, res) => {
         throw new Error('Invalid credentials');
     }
 
-    // Check if password is correct
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
         res.status(400);
         throw new Error('Invalid credentials');
     }
-    //generate token
 
-    const token=generateToken(user._id);
-    //set the cookie 
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Use 'None' in production and 'Lax' in development
-    });
-    res.json({
+    const token = generateToken(user._id);
+
+    res.status(200).json({
         _id: user._id,
         username: user.username,
         email: user.email,
-        token: token,
-       
+        token: `Bearer ${token}`, // Send token in Bearer format
     });
 });
-//logout functionality 
-const logout = asyncHandler(async (req, res) => { 
-    res.clearCookie('token', { path: '/' });
+
+// Forceful Logout functionality (Client should handle token removal)
+const logout = asyncHandler(async (req, res) => {
     res.status(200).json({
-        message: 'Logged out successfully',
+        message: 'Logged out successfully. Please remove the token on the client side.',
     });
 });
 
-
+// Profile functionality (Requires Bearer Token in Authorization header)
 const profile = asyncHandler(async (req, res) => {
-   
     const user = await User.findById(req.user._id).select('-password');
 
     if (!user) {
@@ -118,18 +94,14 @@ const profile = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 
-    const firstName = user.username.split(' ')[0];
-
     res.json({
         _id: user._id,
         username: user.username,
         email: user.email,
         phone: user.phone,
-        img:user.img
+        img: user.img,
     });
 });
 
-
-//exporting the functions
-
-export  { register, login ,logout ,profile };
+// Exporting the functions
+export { register, login, logout, profile };

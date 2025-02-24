@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../../components/navbar/Navbar';
+import { SocketContext } from '../../context/SocketContext';
+
+const API_URL = process.env.NODE_ENV === 'production' ? 'https://bookify-v2-2.onrender.com' : 'http://localhost:8080';
 
 const Room = () => {
-    const { hotelId,roomId } = useParams();
+    const { socket } = useContext(SocketContext);
+    const { hotelId, roomId } = useParams();
     const navigate = useNavigate();
     const [room, setRoom] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -16,43 +20,63 @@ const Room = () => {
     const [searchDetails, setSearchDetails] = useState(null);
 
     useEffect(() => {
-        const fetchSearchDetails = () => {
-            const savedSearchDetails = localStorage.getItem('searchState');
-            if (savedSearchDetails) {
-                const parsedDetails = JSON.parse(savedSearchDetails);
-                setSearchDetails(parsedDetails);
+        const handleConnect = () => {
+            console.log("Connected to server");
+        };
 
-                if (parsedDetails.date.length > 0) {
-                    const startDate = new Date(parsedDetails.date[0].startDate);
-                    const endDate = new Date(parsedDetails.date[0].endDate);
-                    const tempDates = [];
-                    for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
-                        tempDates.push(new Date(d).toISOString().split('T')[0]);
-                    }
-                    setBookingDates(tempDates);
+        const handleRoomBooked = (data) => {
+            console.log("Room booked:", data);
+            fetchData();
+        };
+
+      
+        socket?.on("connect", handleConnect);
+        socket?.on("roomBooked", handleRoomBooked);
+
+        return () => {
+            socket?.off("connect", handleConnect);
+            socket?.off("roomBooked", handleRoomBooked);
+          
+        };
+    }, [socket]);
+
+    const fetchSearchDetails = () => {
+        const savedSearchDetails = localStorage.getItem('searchState');
+        if (savedSearchDetails) {
+            const parsedDetails = JSON.parse(savedSearchDetails);
+            setSearchDetails(parsedDetails);
+
+            if (parsedDetails.date.length > 0) {
+                const startDate = new Date(parsedDetails.date[0].startDate);
+                const endDate = new Date(parsedDetails.date[0].endDate);
+                const tempDates = [];
+                for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+                    tempDates.push(new Date(d).toISOString().split('T')[0]);
                 }
+                setBookingDates(tempDates);
             }
-        };
+        }
+    };
 
-        const fetchData = async () => {
-            try {
-                const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
-                const response = await axios.get(`${API_URL}/api/rooms/${roomId}`);
-                setRoom(response.data);
-                setRoomNumbers(response.data.roomNumbers);
-       
-                setSearchDetails(prevDetails => {
-                    const updatedDetails = { ...prevDetails, price: response.data.room_price };
-                    localStorage.setItem('searchState', JSON.stringify(updatedDetails));
-                    return updatedDetails;
-                });
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/api/rooms/${roomId}`);
+            setRoom(response.data);
+            setRoomNumbers(response.data.roomNumbers);
 
+            setSearchDetails(prevDetails => {
+                const updatedDetails = { ...prevDetails, price: response.data.room_price };
+                localStorage.setItem('searchState', JSON.stringify(updatedDetails));
+                return updatedDetails;
+            });
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchSearchDetails();
         fetchData();
     }, [roomId]);
@@ -71,7 +95,6 @@ const Room = () => {
     };
 
     const handleBookRoom = async () => {
-        const API_URL="https://bookify-v2-2.onrender.com";
         if (!selectedRoom || bookingDates.length === 0) return;
         setShowModal(false);
 
@@ -79,6 +102,7 @@ const Room = () => {
             await axios.put(`${API_URL}/api/rooms/availability/${selectedRoom._id}`, {
                 dates: bookingDates,
             });
+            socket.emit("roomBooked", { roomId, roomNumber: selectedRoom.number });
             navigate(`/bookings/${hotelId}/${roomId}/invoice`);
         } catch (err) {
             console.error(err);

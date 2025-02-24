@@ -7,10 +7,7 @@ import { FaSpinner } from 'react-icons/fa';
 
 const HotelIntro = () => {
     const navigate=useNavigate();
-    const user = localStorage.getItem('user');
-    if(!user){
-        navigate('/login');
-    }
+    
     const { id } = useParams();
     const [hotel, setHotel] = useState(null);
     const [loading, setLoading] = useState(true);

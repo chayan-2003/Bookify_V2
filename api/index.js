@@ -9,6 +9,8 @@ import roomsRoute from "./routes/rooms.js";
 import usersRoute from "./routes/users.js";
 import bodyParser from "body-parser";
 import billRoute from "./routes/bill.js";
+import http from "http"; // Import the http module
+import { Server } from "socket.io";
 
 dotenv.config();
 
@@ -28,6 +30,15 @@ const connect = async () => {
   }
 };
 
+const server = http.createServer(app); // Create an HTTP server
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:3000", "https://bookify-v2-alpha.vercel.app"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  },
+});
+
 // Event Listeners
 mongoose.connection.on("disconnected", () => {
   console.log("MongoDB disconnected!");
@@ -35,16 +46,14 @@ mongoose.connection.on("disconnected", () => {
 
 // Middlewares
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://bookify-v2-alpha.vercel.app'], 
+  origin: ['http://localhost:3000', 'https://bookify-v2-alpha.vercel.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }));
 app.use(cookieParser());
 app.use(express.json());
-app.use(express.urlencoded());
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Routes
@@ -65,9 +74,23 @@ app.use((err, req, res, next) => {
   });
 });
 
+io.on("connection", (socket) => {
+  console.log("a user connected");
 
-app.listen(8080
-  , () => {
+  socket.on("roomBooked", (data) => {
+    console.log("Room booked:", data);
+    // Broadcast the event to all connected clients
+    io.emit("roomBooked", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
+
+app.set("socketio", io);
+
+server.listen(8080, () => { // Use server.listen instead of app.listen
   connect();
   console.log("Connected to backend on port 8080!");
 });

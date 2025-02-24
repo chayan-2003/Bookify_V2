@@ -30,7 +30,11 @@ const BookingDetails = () => {
         const fetchUserDetails = async () => {
             try {
                
-                const response = await axios.get(`${API_URL}/api/auth/profile`, { withCredentials: true });
+                const response = await axios.get(`${API_URL}/api/auth/profile`, {
+                    headers: {
+                        Authorization: ` ${localStorage.getItem('token')}`,
+                    },
+                 });
                 setUserDetails(response.data);
             } catch (error) {
                 console.error("Error fetching user details:", error);
