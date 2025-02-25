@@ -54,14 +54,14 @@ const ProfilePage = () => {
 
       // Send PUT request with FormData
       const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
+      const token=localStorage.getItem('token');
       await axios.put(
         `${API_URL}/api/users/${userId}`,
         formData,
         {
           withCredentials: true,
           headers: {
-            'Content-Type': 'multipart/form-data', // Important for file uploads
-          },
+            Authorization: token },
         }
       );
 
@@ -76,11 +76,14 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const API_URL="https://bookify-v2-2.onrender.com";
+        const token = localStorage.getItem('token');
+        const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
         const response = await axios({
           method: 'get',
           url: `${API_URL}/api/auth/profile`,
-          withCredentials: true,
+          headers: {
+            Authorization: token },
+        
         });
         setUserId(response.data._id);
         setProfileData(response.data);
@@ -157,7 +160,7 @@ const ProfilePage = () => {
             </label>
           </div>
 
-          {/* Form Fields */}
+        
           <form className="space-y-4">
             <div>
               <label className="block font-medium">Full Name</label>

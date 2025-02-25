@@ -16,7 +16,7 @@ const Header = () => {
     const [options, setOptions] = useState({ adult: 1, children: 0, room: 1 });
     const navigate = useNavigate();
     const { setSearch } = useContext(SearchContext);
-
+    const token=localStorage.getItem('token');
     const handleOption = (name, operation) => {
         setOptions(prev => ({
             ...prev,
@@ -38,10 +38,10 @@ const Header = () => {
             <div className="headerContainer">
                 <h1 className="text-4xl font-bold mt-10">Find Your Perfect Stay</h1>
                 <p className="mt-4 text-lg">Book hotels, flights, and more with ease and security.</p>
-                <button className="mt-6 px-6 py-2 bg-yellow-500 rounded-full shadow-md hover:bg-yellow-400 transition font-medium" 
+               {!token &&  (<button className="mt-6 px-6 py-2 bg-yellow-500 rounded-full shadow-md hover:bg-yellow-400 transition font-medium" 
                     onClick={() => navigate("/login")}>
                     Sign in 
-                </button>
+                </button>)}
                 <button className="mt-6 px-6 py-2 ml-7 bg-yellow-500 rounded-full shadow-md hover:bg-yellow-400 transition font-medium"
                     onClick={() => navigate("/search")}>
                     GeoSearch
@@ -73,7 +73,7 @@ const Header = () => {
                     <div className="flex-1 text-black">
                         <FontAwesomeIcon icon={faPerson} />
                         <span className="ml-4 cursor-pointer" onClick={() => setOpenOptions(!openOptions)}>
-                            {options.adult} Adult · {options.children} Children · {options.room}
+                            {options.adult} Adult · {options.children} Children · {options.room} Room
                         </span>
                         {openOptions && (
                             <div className="absolute bg-white shadow-md rounded-lg p-4">

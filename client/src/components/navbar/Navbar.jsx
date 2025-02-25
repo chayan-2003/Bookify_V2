@@ -15,41 +15,39 @@ const Navbar = () => {
   // Fetch profile data on mount
   const token = localStorage.getItem('token');
 
-
-    useEffect(() => {
-      if(!token) {
-        setLoading(false);
-        setIsLoggedIn(false);
-        return;
-      }
-      const fetchProfile = async () => {
-
-        try {
-          const response = await axios.get(`${API_URL}/api/auth/profile`, {
-            headers: { Authorization: token },
-          });
-          setIsLoggedIn(true);
-          setProfileData(response.data);
-        } catch (err) {
-          console.error('Error fetching profile:', err);
-          if (err.response?.status === 401) {
-            navigate('/login');
-          }
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchProfile();
-    }, [navigate]);
-
-    // Handle logout
-    const handleLogout = () => {
-      localStorage.removeItem('token');
+  useEffect(() => {
+    if (!token) {
+      setLoading(false);
       setIsLoggedIn(false);
-      navigate('/');
+      return;
+    }
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/auth/profile`, {
+          headers: { Authorization: token },
+        });
+        setIsLoggedIn(true);
+        setProfileData(response.data);
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        if (err.response?.status === 401) {
+          navigate('/login');
+        }
+      } finally {
+        setLoading(false);
+      }
     };
-  
+
+    fetchProfile();
+  }, [navigate, token]);
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    navigate('/');
+  };
+
   // Loading spinner while fetching data
   if (loading) {
     return (
@@ -91,7 +89,15 @@ const Navbar = () => {
             ) : (
               // Profile Section if logged in
               <div className="relative flex items-center space-x-4">
-                <FaUserCircle className="text-3xl cursor-pointer hover:text-yellow-400" />
+                {profileData?.img ? (
+                  <img
+                    src={profileData.img}
+                    alt="Profile"
+                    className="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80"
+                  />
+                ) : (
+                  <FaUserCircle className="text-3xl cursor-pointer hover:text-yellow-400" />
+                )}
                 <div className="ml-2 text-sm">
                   <Link to="/profile" className="hover:underline">
                     Welcome, {profileData?.username}

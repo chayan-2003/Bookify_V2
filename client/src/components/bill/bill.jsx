@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '../navbar/Navbar.jsx';
-import { FaDownload } from 'react-icons/fa';
+import { FaDownload, FaSpinner } from 'react-icons/fa';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 
@@ -13,7 +13,8 @@ const BookingDetails = () => {
     const { hotelId, roomId } = useParams();
     const [noofdays, setNoofdays] = useState(0);
     const [loading, setLoading] = useState(false);
-    const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
+    const API_URL = process.env.NODE_ENV === 'production' ? 'https://bookify-v2-2.onrender.com' : 'http://localhost:8080';
+
     useEffect(() => {
         const fetchSearchDetails = () => {
             const savedSearchDetails = localStorage.getItem('searchState');
@@ -29,12 +30,11 @@ const BookingDetails = () => {
 
         const fetchUserDetails = async () => {
             try {
-               
                 const response = await axios.get(`${API_URL}/api/auth/profile`, {
                     headers: {
                         Authorization: ` ${localStorage.getItem('token')}`,
                     },
-                 });
+                });
                 setUserDetails(response.data);
             } catch (error) {
                 console.error("Error fetching user details:", error);
@@ -88,9 +88,39 @@ const BookingDetails = () => {
         return doc;
     };
 
-    const handleDownloadReceipt = () => {
+    const handleDownloadReceipt = async () => {
+        setLoading(true);
         const doc = generatePDF();
-        doc.save(`invoice_${search.invoiceNumber}.pdf`);
+        const pdfBlob = doc.output('blob');
+
+        try {
+            const response = await axios.post(`${API_URL}/api/generate`, {
+                guestName: user.username,
+                checkIn: new Date(search.date[0]?.startDate).toLocaleDateString(),
+                checkOut: new Date(search.date[0]?.endDate).toLocaleDateString(),
+                roomType: room.title,
+                totalAmount: room.room_price * noofdays,
+                email: user.email
+            }, {
+                headers: {
+                    Authorization: ` ${localStorage.getItem('token')}`,
+                },
+            });
+
+            const { preSignedUrl } = response.data;
+
+            await axios.put(preSignedUrl, pdfBlob, {
+                headers: {
+                    'Content-Type': 'application/pdf',
+                },
+            });
+
+            doc.save(`invoice_${search.invoiceNumber}.pdf`);
+        } catch (error) {
+            console.error("Error generating and uploading bill:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (!search || !user || !hotel || !room) {
@@ -130,16 +160,23 @@ const BookingDetails = () => {
                             <p><b>Total Amount:</b> ${room.room_price * noofdays}</p>
                         </div>
                     </div>
-                    <div className="mt-6 text-center">
+                    <div className="mt-6 text-center flex justify-center ">
                         <button
                             onClick={handleDownloadReceipt}
                             disabled={loading}
-                            className={`$${
-                                loading ? 'bg-gray-400' : 'bg-indigo-600 hover:bg-indigo-700'
-                            } text-white py-3 px-6 rounded-md font-semibold transition`}
+                            className={`flex items-center justify-center ${loading ? 'bg-gray-400' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-semibold py-2 px-4 rounded transition duration-200 ease-in-out`}
                         >
-                            <FaDownload className="inline mr-2" />
-                            {loading ? 'Generating...' : 'Generate & Download Bill Receipt'}
+                            {loading ? (
+                                <>
+                                    <FaSpinner className="animate-spin mr-2" />
+                                    Generating...
+                                </>
+                            ) : (
+                                <>
+                                    <FaDownload className="mr-2" />
+                                       Download Bill
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>
