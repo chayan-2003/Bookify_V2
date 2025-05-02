@@ -16,8 +16,11 @@ const List = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const API_URL=process.env.NODE_ENV==='production'?'https://bookify-v2-2.onrender.com':'http://localhost:8080';
-  console.log(city);
+
+  const API_URL = process.env.NODE_ENV === 'production'
+    ? 'https://bookify-v2-2.onrender.com'
+    : 'http://localhost:8080';
+
   useEffect(() => {
     const getData = async () => {
       try {
@@ -54,10 +57,10 @@ const List = () => {
       </div>
 
       <div className="ListContainer mx-auto max-w-screen-xl p-6">
-        <div className="ListWrapper flex gap-8">
+        <div className="ListWrapper flex flex-col md:flex-row gap-8">
 
           {/* Search Section */}
-          <div className="ListSearch bg-white rounded-lg shadow-xl p-6 w-80 ">
+          <div className="ListSearch bg-white rounded-lg shadow-xl p-6 w-full md:w-[320px]">
             <h1 className="text-2xl font-bold text-gray-800 mb-4">Search</h1>
 
             {/* Destination Input */}
@@ -79,7 +82,8 @@ const List = () => {
                 onClick={() => setOpenDate(!openDate)}
                 className="w-full mt-2 p-3 bg-white border border-gray-300 rounded-md cursor-pointer text-gray-600 flex justify-between items-center"
               >
-                {date.length > 0 && `${format(new Date(date[0].startDate), "dd/MM/yyyy")} to ${format(new Date(date[0].endDate), "dd/MM/yyyy")}`}
+                {date.length > 0 &&
+                  `${format(new Date(date[0].startDate), "dd/MM/yyyy")} to ${format(new Date(date[0].endDate), "dd/MM/yyyy")}`}
               </span>
               {openDate && (
                 <DateRange
@@ -119,14 +123,12 @@ const List = () => {
           </div>
 
           {/* Results Section */}
-          <div className="ListResult flex-1">
+          <div className="ListResult w-full md:flex-1">
             {loading ? (
-                          
-                                  <div className="flex justify-center items-center h-full">
-                                    <FaSpinner className="animate-spin text-indigo-600 text-2xl" />
-                                  </div>
-                                )
-            : (
+              <div className="flex justify-center items-center h-full">
+                <FaSpinner className="animate-spin text-indigo-600 text-2xl" />
+              </div>
+            ) : (
               data?.map(item => (
                 <SearchItem item={item} key={item._id} />
               ))
