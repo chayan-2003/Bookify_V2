@@ -52,9 +52,10 @@ const List = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <div className="pb-6">
+      {/* Containerized Navbar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Navbar />
-      </div>
+     
 
       <div className="ListContainer mx-auto max-w-screen-xl p-6">
         <div className="ListWrapper flex flex-col md:flex-row gap-8">
@@ -136,6 +137,7 @@ const List = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
