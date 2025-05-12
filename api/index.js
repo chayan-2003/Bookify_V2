@@ -33,7 +33,7 @@ const connect = async () => {
 const server = http.createServer(app); // Create an HTTP server
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://bookify-tawny.vercel.app/"],
+    origin: ["http://localhost:3000", "https://bookify-tawny.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
@@ -46,7 +46,7 @@ mongoose.connection.on("disconnected", () => {
 
 // Middlewares
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://bookify-tawny.vercel.app/'],
+  origin: ['http://localhost:3000', 'https://bookify-tawny.vercel.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }));
@@ -89,6 +89,7 @@ io.on("connection", (socket) => {
 });
 
 app.set("socketio", io);
+app.options('*', cors());
 
 server.listen(8080, () => { // Use server.listen instead of app.listen
   connect();
