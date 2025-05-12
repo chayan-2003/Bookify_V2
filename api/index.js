@@ -33,7 +33,7 @@ const connect = async () => {
 const server = http.createServer(app); // Create an HTTP server
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://bookify-v2-alpha.vercel.app"],
+    origin: ["http://localhost:3000", "https://bookify-tawny.vercel.app/"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
