@@ -46,7 +46,7 @@ mongoose.connection.on("disconnected", () => {
 
 // Middlewares
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://bookify-v2-alpha.vercel.app'],
+  origin: ['http://localhost:3000', 'https://bookify-tawny.vercel.app/'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }));
