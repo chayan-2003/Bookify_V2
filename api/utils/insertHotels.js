@@ -19,7 +19,7 @@ const hotels = [
       city: "New York",
       address: "123 Sunshine St",
       distance: "2km",
-      photos: ["photo1.jpg", "photo2.jpg"],
+      photos: ["https://i0.wp.com/midnightoilstudios.org/wp-content/uploads/2022/02/sunshine.jpg?resize=400%2C266&ssl=1", "photo2.jpg"],
       desc: "A beautiful hotel in the heart of New York.",
       rooms: ["101", "102", "103", "104", "105"],
       cheapestPrice: 150,
