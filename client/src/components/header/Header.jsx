@@ -1,121 +1,96 @@
-import { faBed, faCalendarDays, faPerson } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { format } from 'date-fns';
-import React, { useContext, useState } from 'react';
-import { DateRange } from 'react-date-range';
-import 'react-date-range/dist/styles.css';
-import 'react-date-range/dist/theme/default.css';
-import { useNavigate } from 'react-router-dom';
-import { SearchContext } from '../../context/SearchContext';
+import React from 'react';
+import { FaCheckCircle, FaHeadset, FaLock, FaWallet } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
-const Header = () => {
-    const [destination, setDestination] = useState("");
-    const [openDate, setOpenDate] = useState(false);
-    const [date, setDate] = useState([{ startDate: new Date(), endDate: new Date(), key: "selection" }]);
-    const [openOptions, setOpenOptions] = useState(false);
-    const [options, setOptions] = useState({ adult: 1, children: 0, room: 1 });
-    const navigate = useNavigate();
-    const { setSearch } = useContext(SearchContext);
-    const token = localStorage.getItem('token');
+const WhyBookWithUs = () => {
+    const features = [
+        {
+            icon: <FaCheckCircle className="text-green-400 text-4xl md:text-5xl" />,
+            title: "Verified Listings",
+            desc: "Only genuine and verified hotels you can trust. Our team meticulously inspects and approves every listing to ensure top quality and transparency.",
+            img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80"
+        },
+        {
+            icon: <FaWallet className="text-yellow-300 text-4xl md:text-5xl" />,
+            title: "Best Price Guarantee",
+            desc: "Enjoy unmatched deals with zero compromise on quality. No hidden charges, ever. Transparent pricing is at our core.",
+            img: "./W2.jpg"
+        },
+         {
+            icon: <FaHeadset className="text-pink-400 text-4xl md:text-5xl" />,
+            title: "24/7 Support",
+            desc: "Our dedicated support team is available round the clock. Whether it’s a booking issue or a last-minute change—we’ve got your back.",
+            img: "./W4.png"
+        },
+        {
+            icon: <FaLock className="text-blue-400 text-4xl md:text-5xl" />,
+            title: "Secure Booking",
+            desc: "Industry-grade encryption ensures your data is always safe. Book confidently knowing your transactions are protected.",
+            img: "./W3.jpg"
+        },
+       
+    ];
 
-    const handleOption = (name, operation) => {
-        setOptions(prev => ({
-            ...prev,
-            [name]: operation === "i" ? options[name] + 1 : Math.max(options[name] - 1, 0),
-        }));
+    const containerVariants = {
+        hidden: {},
+        visible: {
+            transition: {
+                staggerChildren: 0.3,
+            },
+        },
     };
 
-    const handleSearch = () => {
-        setSearch({ city: destination, date, options });
-        navigate("/hotels");
+    const featureVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeInOut" } },
+        hover: { scale: 1.03, transition: { duration: 0.2 } },
+    };
+
+    const pulseAnimation = {
+        initial: { scale: 1 },
+        animate: { scale: 1.15, transition: { duration: 2, repeat: Infinity, repeatType: 'reverse' } },
     };
 
     return (
-        <div className="header px-4 md:px-12 pt-8 pb-10 bg-gradient-to-r from-blue-600 to-purple-700 text-white">
-            <div className="headerContainer max-w-7xl mx-auto">
-                <h1 className="text-3xl sm:text-4xl font-bold mt-6 text-center sm:text-left">Find Your Perfect Stay</h1>
-                <p className="mt-3 sm:mt-4 text-base sm:text-lg text-center sm:text-left">Book hotels, flights, and more with ease and security.</p>
+        <section className="w-full py-20 bg-gradient-to-b from-black via-black to-purple-900 text-white px-6 relative overflow-hidden">
+            {/* Animated Background Blurs */}
+            <motion.div className="absolute top-1/4 left-12 w-28 h-28 rounded-full bg-purple-500 opacity-20 blur-2xl" variants={pulseAnimation} initial="initial" animate="animate" />
+            <motion.div className="absolute bottom-1/3 right-24 w-32 h-32 rounded-full bg-cyan-400 opacity-20 blur-2xl" variants={pulseAnimation} initial="initial" animate={{ ...pulseAnimation.animate, transition: { ...pulseAnimation.animate.transition, delay: 0.5 } }} />
+            <motion.div className="absolute top-2/3 left-40 w-24 h-24 rounded-full bg-pink-400 opacity-20 blur-2xl" variants={pulseAnimation} initial="initial" animate={{ ...pulseAnimation.animate, transition: { ...pulseAnimation.animate.transition, delay: 1 } }} />
 
-                <div className="mt-6 flex flex-col sm:flex-row justify-center sm:justify-start items-center gap-4">
-                    {!token && (
-                        <button
-                            className="px-5 py-2 bg-yellow-500 rounded-full shadow-md hover:bg-yellow-400 transition font-medium w-full sm:w-auto"
-                            onClick={() => navigate("/login")}
+            {/* Content */}
+            <div className="max-w-7xl mx-auto text-center relative z-10">
+                <h2 className="text-4xl sm:text-5xl font-extrabold mb-14 pb-10 bg-gradient-to-r from-indigo-400 via-pink-400 to-cyan-400 text-transparent bg-clip-text">
+                    Why Choose Us?
+                </h2>
+
+                <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-12 px-4" variants={containerVariants} initial="hidden" animate="visible">
+                    {features.map((item, i) => (
+                        <motion.div
+                            key={i}
+                            className="flex flex-col md:flex-row items-centerbg-white/5 backdrop-blur-lg p-8 rounded-2xl border border-white/10 hover:border-cyan-400 transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] hover:shadow-cyan-500/30 items-center hover:scale-[1.03]"
+                            variants={featureVariants}
+                            whileHover="hover"
                         >
-                            Sign in
-                        </button>
-                    )}
-                    <button
-                        className="px-5 py-2 bg-yellow-500 rounded-full shadow-md hover:bg-yellow-400 transition font-medium w-full sm:w-auto"
-                        onClick={() => navigate("/search")}
-                    >
-                        GeoSearch
-                    </button>
-                </div>
+                            {/* Image */}
+                            <img
+                                src={item.img}
+                                alt={item.title}
+                                className="w-full md:w-40 h-32 md:h-40 object-cover rounded-xl mb-6 md:mb-0 md:mr-6 shadow-md"
+                            />
 
-                <div className="headerSearch mt-6 bg-white rounded-lg shadow-lg p-4 flex flex-col md:flex-row md:items-center gap-4 text-black">
-                    <div className="flex items-center w-full md:w-1/4 relative">
-                        <FontAwesomeIcon icon={faBed} />
-                        <input
-                            type="text"
-                            placeholder="Where are you going?"
-                            className="ml-3 p-2 w-full outline-none"
-                            onChange={e => setDestination(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="w-full md:w-1/3 relative">
-                        <div className="flex items-center cursor-pointer" onClick={() => setOpenDate(!openDate)}>
-                            <FontAwesomeIcon icon={faCalendarDays} />
-                            <span className="ml-3">
-                                {format(date[0].startDate, "dd/MM/yyyy")} - {format(date[0].endDate, "dd/MM/yyyy")}
-                            </span>
-                        </div>
-                        {openDate && (
-                            <div className="absolute z-20 mt-2 left-0 min-w-full">
-                                <DateRange
-                                    onChange={item => setDate([item.selection])}
-                                    ranges={date}
-                                    minDate={new Date()}
-                                    className="rounded-lg shadow-lg border p-2 text-black"
-                                />
+                            {/* Text Content */}
+                            <div className="text-left">
+                                <div className="mb-4">{item.icon}</div>
+                                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                                <p className="text-sm text-gray-300 leading-relaxed">{item.desc}</p>
                             </div>
-                        )}
-                    </div>
-
-                    <div className="w-full md:w-1/3 relative">
-                        <div className="flex items-center cursor-pointer" onClick={() => setOpenOptions(!openOptions)}>
-                            <FontAwesomeIcon icon={faPerson} />
-                            <span className="ml-3">{options.adult} Adult · {options.children} Children · {options.room} Room</span>
-                        </div>
-                        {openOptions && (
-                            <div className="absolute bg-white text-black shadow-md rounded-lg p-4 mt-2 z-20 w-full">
-                                {["adult", "children", "room"].map((type, idx) => (
-                                    <div key={idx} className="flex justify-between items-center mb-2">
-                                        <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
-                                        <div>
-                                            <button onClick={() => handleOption(type, "d")} className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">-</button>
-                                            <span className="mx-2">{options[type]}</span>
-                                            <button onClick={() => handleOption(type, "i")} className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">+</button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="w-full md:w-auto">
-                        <button
-                            onClick={handleSearch}
-                            className="w-full px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition"
-                        >
-                            Search
-                        </button>
-                    </div>
-                </div>
+                        </motion.div>
+                    ))}
+                </motion.div>
             </div>
-        </div>
+        </section>
     );
 };
 
-export default Header;
+export default WhyBookWithUs;
