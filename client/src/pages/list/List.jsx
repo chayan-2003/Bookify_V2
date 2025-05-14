@@ -17,9 +17,13 @@ const List = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = process.env.NODE_ENV === 'production'
-    ? 'https://bookify-v2-2.onrender.com'
-    : 'http://localhost:8080';
+  useEffect(() => {
+    if (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [error]);
+
+  const API_URL = 'https://bookify-v2-2.onrender.com';
 
   useEffect(() => {
     const getData = async () => {
@@ -51,94 +55,151 @@ const List = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      {/* Containerized Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Navbar />
-     
+    <div className="bg-gradient-to-br from-black  via-purple-900 to-gray-900 min-h-screen text-white">
+      {/* Floating Navbar */}
+      <div className="fixed top-0 left-0 w-full z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          {/* Assuming Navbar is a component you have */}
+          <Navbar />
+        </div>
+      </div>
+      <div className="py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-      <div className="ListContainer mx-auto max-w-screen-xl p-6">
-        <div className="ListWrapper flex flex-col md:flex-row gap-8">
-
-          {/* Search Section */}
-          <div className="ListSearch bg-white rounded-lg shadow-xl p-6 w-full md:w-[320px]">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Search</h1>
+        {/* Sidebar Search Card */}
+        <aside className="lg:col-span-1">
+          <div className="bg-gray-800 rounded-xl shadow-lg p-8 sticky top-8">
+            <h2 className="text-xl font-semibold text-white mb-6">Refine Your Search</h2>
 
             {/* Destination Input */}
-            <div className="mb-6">
-              <label className="block text-gray-600 font-semibold">Destination</label>
+            <div className="mb-4">
+              <label htmlFor="destination" className="block text-sm font-medium text-gray-300 mb-2">Destination</label>
               <input
+                id="destination"
                 value={destination}
-                onChange={e => setDestination(e.target.value)}
+                onChange={e => {
+                  const value = e.target.value;
+                  setDestination(value);
+                  if (value === "") {
+                    setSearch({ city: "", date, options }); // Reset filter if cleared
+                  }
+                }}
                 placeholder={city}
                 type="text"
-                className="w-full mt-2 p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                className="w-full px-4 py-2 border border-gray-700 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-700 text-white"
               />
+
             </div>
 
             {/* Date Picker */}
-            <div className="mb-6">
-              <label className="block text-gray-600 font-semibold">Check-in Date</label>
-              <span
-                onClick={() => setOpenDate(!openDate)}
-                className="w-full mt-2 p-3 bg-white border border-gray-300 rounded-md cursor-pointer text-gray-600 flex justify-between items-center"
-              >
-                {date.length > 0 &&
-                  `${format(new Date(date[0].startDate), "dd/MM/yyyy")} to ${format(new Date(date[0].endDate), "dd/MM/yyyy")}`}
-              </span>
-              {openDate && (
-                <DateRange
-                  onChange={(item) => setSearch({ city: destination, date: [item.selection], options })}
-                  minDate={new Date()}
-                  ranges={date}
-                />
-              )}
+            <div className="mb-4">
+              <label htmlFor="checkin" className="block text-sm font-medium text-gray-300 mb-2">Check-in Date</label>
+              <div className="relative">
+                <div
+                  onClick={() => setOpenDate(!openDate)}
+                  className="w-full px-4 py-2 border border-gray-700 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm cursor-pointer flex justify-between items-center bg-gray-700 text-white"
+                >
+                  <span>
+                    {date.length > 0
+                      ? `${format(new Date(date[0].startDate), "MMM dd, yyyy")} - ${format(
+                        new Date(date[0].endDate),
+                        "MMM dd, yyyy"
+                      )}`
+                      : <span className="text-gray-500">Select Dates</span>}
+                  </span>
+                  <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                {openDate && (
+                  <div className="absolute top-full left-0 z-10 mt-1 bg-gray-800 rounded-md shadow-lg border border-gray-700">
+                    <DateRange
+                      onChange={(item) =>
+                        setSearch({ city: destination, date: [item.selection], options })
+                      }
+                      minDate={new Date()}
+                      ranges={date}
+                      className="rounded-md shadow-md"
+                      color="#4f46e5"
+                      rangeColors={["#4f46e5"]}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Price Range */}
+            {/* Price Filters */}
             <div className="mb-6">
-              <div className="flex justify-between mb-3">
-                <span className="text-gray-600 font-semibold">Min price</span>
-                <input
-                  type="number"
-                  onChange={e => setMin(e.target.value)}
-                  className="w-20 p-2 rounded-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
-                />
-              </div>
-              <div className="flex justify-between mb-3">
-                <span className="text-gray-600 font-semibold">Max price</span>
-                <input
-                  type="number"
-                  onChange={e => setMax(e.target.value)}
-                  className="w-20 p-2 rounded-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
-                />
+              <label className="block text-sm font-medium text-gray-300 mb-2">Price Range (per night)</label>
+              <div className="flex space-x-3">
+                <div className="flex-1">
+                  <label htmlFor="min-price" className="block text-xs font-medium text-gray-500 mb-1">Min</label>
+                  <input
+                    type="number"
+                    onChange={e => setMin(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-700 text-white"
+                    placeholder="₹"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="max-price" className="block text-xs font-medium text-gray-500 mb-1">Max</label>
+                  <input
+                    type="number"
+                    onChange={e => setMax(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-700 text-white"
+                    placeholder="₹"
+                  />
+                </div>
               </div>
             </div>
 
             <button
               onClick={handleClick}
-              className="w-full py-3 bg-blue-600 text-white rounded-md text-lg font-semibold shadow-md hover:bg-blue-700 transition duration-300"
+              className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
             >
-              Search
+              Search Hotels
             </button>
           </div>
+        </aside>
 
-          {/* Results Section */}
-          <div className="ListResult w-full md:flex-1">
-            {loading ? (
-              <div className="flex justify-center items-center h-full">
-                <FaSpinner className="animate-spin text-indigo-600 text-2xl" />
-              </div>
-            ) : (
-              data?.map(item => (
-                <SearchItem item={item} key={item._id} />
-              ))
+        {/* Results Section */}
+        <main className="lg:col-span-2">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-semibold text-white tracking-tight">Explore Stays</h1>
+            {data?.length > 0 && (
+              <span className="text-lg text-gray-400">{data.length} results</span>
             )}
           </div>
-        </div>
+
+          {loading ? (
+            <div className="flex justify-center items-center h-64 bg-gray-900 rounded-xl">
+              <svg className="animate-spin h-12 w-12 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 009.828 16.718m5.978-1.718A8.002 8.002 0 0115.414 9V4m0 0L9.828 15.282m5.978-1.718A8.001 8.001 0 0112 2.25m-5.828 13.856a8.001 8.001 0 0013.172-7.718m-13.172-7.718a8.002 8.002 0 0111.656 2.03" />
+              </svg>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {data?.length > 0 ? (
+                data.map(item => (
+                  <div
+                    key={item._id}
+                    className=" rounded-xl border border-gray-700 p-4 shadow-md hover:shadow-xl hover:ring-1 hover:ring-indigo-500 transition duration-300"
+                  >
+                    <SearchItem item={item} />
+                  </div>
+                ))
+              ) : (
+                <div className="bg-gray-900 rounded-md p-8 text-center border border-gray-700">
+                  <p className="text-gray-500 italic text-lg">No properties found matching your criteria.</p>
+                </div>
+              )}
+            </div>
+          )}
+        </main>
+
+
       </div>
     </div>
-    </div>
+
   );
 }
 
